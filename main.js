@@ -380,8 +380,8 @@
         return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}`;
     }
 
-    // উন্নত Random ফাংশন (একটানা ২ বারের বেশি একই সিগন্যাল আসবে না)
-    function generateBalancedRandom() {
+    // প্রকৃত Random ফাংশন (রোবটের মতো UP-DOWN-UP-DOWN করবে না, আবার একটানা ৩ বারের বেশি একই সিগন্যালও দেবে না)
+    function generateTrueRandom() {
         let pick;
         if (window.crypto && window.crypto.getRandomValues) {
             const arr = new Uint32Array(1);
@@ -393,7 +393,7 @@
 
         if (pick === lastSignal) {
             streakCount++;
-            if (streakCount >= 2) {
+            if (streakCount > 3) {
                 pick = (lastSignal === 'UP') ? 'DOWN' : 'UP';
                 streakCount = 1;
             }
@@ -413,7 +413,7 @@
         sigSub.textContent = `Synced for ${minuteFormatted}`;
     }
 
-    // স্ক্রিন স্ক্যান এবং সিগন্যাল জেনারেট ফাংশন
+    // স্ক্রিন স্ক্যান এবং সিগন্যাল জেনারেট ফাংশন (একই মিনিটে সিগন্যাল পরিবর্তন হবে না)
     function runChartScan() {
         if (isScanning) return;
         isScanning = true;
@@ -432,8 +432,13 @@
             scanBtn.textContent = '🔍 SCAN AGAIN';
 
             const now = new Date();
-            currentMinuteKey = getMinuteKey(now);
-            currentSignal = generateBalancedRandom();
+            const minKey = getMinuteKey(now);
+
+            // শুধুমাত্র নতুন মিনিট হলেই নতুন সিগন্যাল তৈরি হবে, একই মিনিটে ক্লিক করলে ওই মিনিটের সিগন্যালই থাকবে
+            if (currentMinuteKey !== minKey || !currentSignal) {
+                currentMinuteKey = minKey;
+                currentSignal = generateTrueRandom();
+            }
 
             const h = String(now.getHours() % 12 || 12).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
@@ -465,7 +470,7 @@
         const minKey = getMinuteKey(now);
         if (currentSignal && currentMinuteKey !== minKey && !isScanning) {
             currentMinuteKey = minKey;
-            currentSignal = generateBalancedRandom();
+            currentSignal = generateTrueRandom();
             renderSignal(currentSignal, `${h}:${m} ${ampm}`);
         }
     }, 1000);
