@@ -1,335 +1,553 @@
 (function() {
-    // একই উইজেট বারবার তৈরি হওয়া রোধ করা
-    if (document.getElementById('floating-trading-bot-widget')) {
-        console.log("Bot is already running.");
-        return;
-    }
+    // আগে থেকে কোনো উইজেট থাকলে সেটি মুছে নতুন আপডেট লোড করবে (একাধিক উইজেট তৈরি হবে না)
+    const oldWidget = document.getElementById('floating-trading-bot-widget');
+    if (oldWidget) oldWidget.remove();
+    const oldOverlay = document.getElementById('tb-scan-overlay');
+    if (oldOverlay) oldOverlay.remove();
+    const oldStyle = document.getElementById('tb-bot-styles');
+    if (oldStyle) oldStyle.remove();
 
-    // ১. CSS স্টাইল যুক্ত করা (Dark Theme, Gradient, Scanner Animation)
+    // ১. CSS স্টাইল (ভিডিওর নিয়ন বাটন + স্ক্রিন স্ক্যানার + আপনার কোডের সিগন্যাল প্যানেল)
     const style = document.createElement('style');
+    style.id = 'tb-bot-styles';
     style.innerHTML = `
-        /* Widget & Button Styles */
         #floating-trading-bot-widget {
             position: fixed;
-            top: 20%;
-            right: 20px;
+            top: 55%;
+            right: 25px;
             z-index: 9999999;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        .tb-logo-btn {
-            width: 65px;
-            height: 65px;
+
+        /* ভিডিওর মতো রাউন্ড লোগো বাটন */
+        .tb-logo-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: grab;
+        }
+        .tb-logo-wrapper:active {
+            cursor: grabbing;
+        }
+        .tb-logo-circle {
+            width: 72px;
+            height: 72px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #0d1b2a, #1a2744);
-            border: 2px solid #00c9ff;
-            box-shadow: 0 0 15px rgba(0, 201, 255, 0.4);
-            color: #00c9ff;
+            background: radial-gradient(circle, #2a0808 0%, #0a0e1a 80%);
+            border: 3.5px solid #00ff66;
+            box-shadow: 0 0 18px rgba(0, 255, 102, 0.6), inset 0 0 12px rgba(255, 0, 55, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .tb-logo-circle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 255, 102, 0.9);
+        }
+        .tb-logo-inner-text {
+            background: #111;
+            border: 1px solid #00c9ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: 0.5px;
+            text-align: center;
+            line-height: 1.1;
+            box-shadow: 0 0 8px rgba(0, 201, 255, 0.5);
+        }
+        .tb-logo-inner-text span {
+            color: #ff2a5f;
+            font-size: 8px;
+            display: block;
+        }
+        .tb-badge-close {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff2a75;
+            color: #fff;
+            font-size: 11px;
+            font-weight: bold;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            cursor: pointer;
+            z-index: 2;
+        }
+        .tb-bot-label {
+            margin-top: 6px;
+            font-size: 11px;
             font-weight: 900;
-            font-size: 13px;
-            cursor: grab;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-align: center;
-            line-height: 1.2;
+            color: #c8ff00;
+            text-shadow: 0 2px 4px #000, 0 0 10px rgba(200, 255, 0, 0.5);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            white-space: nowrap;
         }
-        .tb-logo-btn:active {
-            cursor: grabbing;
-            transform: scale(0.95);
-        }
-        
-        /* Panel Styles */
+
+        /* মেইন সিগন্যাল প্যানেল */
         .tb-panel {
             display: none;
             position: absolute;
-            top: 80px;
+            bottom: 105px;
             right: 0;
-            width: 240px;
-            background: rgba(13, 27, 42, 0.95);
-            border-radius: 12px;
-            border: 1px solid #1e3a5f;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            padding: 15px;
-            color: white;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            animation: tbFadeIn 0.3s ease-out;
+            width: 260px;
+            background: #0d1b2a;
+            border: 1px solid #00c9ff66;
+            border-radius: 14px;
+            padding: 16px;
+            color: #e0e6f0;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 201, 255, 0.2);
+            animation: tbPopIn 0.25s ease-out;
         }
-        @keyframes tbFadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes tbPopIn {
+            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
-        .tb-header {
+        .tb-panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #1e3a5f;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             margin-bottom: 12px;
         }
-        .tb-title {
-            font-size: 13px;
-            font-weight: bold;
-            color: #00c9ff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .tb-close {
-            cursor: pointer;
-            color: #e74c3c;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .tb-time {
+        .tb-panel-title {
             font-size: 14px;
-            color: #ddd;
-            margin-bottom: 10px;
+            font-weight: 800;
+            color: #00c9ff;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 12px #00c9ff66;
+        }
+        .tb-panel-close {
+            cursor: pointer;
+            color: #7a9abf;
+            font-size: 15px;
             font-weight: bold;
         }
-        
-        /* Prediction Box */
-        .tb-prediction-box {
-            font-size: 28px;
-            font-weight: 900;
-            padding: 15px 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            letter-spacing: 2px;
-            transition: all 0.3s;
-            border: 2px dashed #4a6a8a;
-            color: #7a9abf;
-            background: #111e30;
-        }
-        .tb-up {
-            background: rgba(46, 204, 113, 0.15);
-            color: #2ecc71;
-            border: 2px solid #2ecc71;
-            text-shadow: 0 0 15px rgba(46, 204, 113, 0.6);
-        }
-        .tb-down {
-            background: rgba(231, 76, 60, 0.15);
+        .tb-panel-close:hover {
             color: #e74c3c;
-            border: 2px solid #e74c3c;
-            text-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
         }
-        
-        /* Analyze Button */
-        .tb-analyze-btn {
+
+        .tb-time-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #7a9abf;
+            margin-bottom: 12px;
+            background: #111e30;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #1e3a5f;
+        }
+        .tb-time-val {
+            color: #00c9ff;
+            font-weight: 700;
+        }
+
+        .tb-analyse-btn {
             width: 100%;
             padding: 12px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 700;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
             background: linear-gradient(135deg, #005b8e, #0099cc);
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             text-transform: uppercase;
             transition: all 0.2s;
-            margin-bottom: 10px;
-            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.25);
+            margin-bottom: 12px;
         }
-        .tb-analyze-btn:hover {
+        .tb-analyse-btn:hover {
             background: linear-gradient(135deg, #006fa8, #00b8f0);
         }
-        .tb-analyze-btn:disabled {
+        .tb-analyse-btn:disabled {
             background: #1e3a5f;
-            color: #4a6a8a;
+            color: #5a7a9a;
             cursor: not-allowed;
             box-shadow: none;
         }
 
-        /* Scanner Animation Overlay (Full Screen) */
-        .tb-scan-overlay {
+        /* সিগন্যাল বক্স (UP / DOWN) */
+        .tb-signal-box {
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid #1e3a5f;
+            background: #111e30;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        .tb-signal-box.up {
+            background: #0a2e1a;
+            border-color: #27ae60;
+            box-shadow: 0 0 25px rgba(39, 174, 96, 0.3);
+        }
+        .tb-signal-box.down {
+            background: #2e0a0a;
+            border-color: #e74c3c;
+            box-shadow: 0 0 25px rgba(231, 76, 60, 0.3);
+        }
+        .tb-sig-label {
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: #7a9abf;
+            text-transform: uppercase;
+        }
+        .tb-sig-arrow {
+            font-size: 44px;
+            line-height: 1;
+            margin: 4px 0;
+            color: #4a6a8a;
+        }
+        .tb-signal-box.up .tb-sig-arrow {
+            color: #2ecc71;
+            text-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+        }
+        .tb-signal-box.down .tb-sig-arrow {
+            color: #e74c3c;
+            text-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+        }
+        .tb-sig-text {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #7a9abf;
+        }
+        .tb-signal-box.up .tb-sig-text { color: #2ecc71; }
+        .tb-signal-box.down .tb-sig-text { color: #e74c3c; }
+        .tb-sig-sub {
+            font-size: 10px;
+            color: #5a7a9a;
+        }
+
+        /* টাইমার প্রগ্রেস বার */
+        .tb-timer-label {
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: #7a9abf;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            display: flex;
+            justify-content: space-between;
+        }
+        .tb-timer-bar-wrap {
+            background: #111e30;
+            border-radius: 6px;
+            height: 7px;
+            overflow: hidden;
+            border: 1px solid #1e3a5f;
+        }
+        .tb-timer-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #005b8e, #00c9ff);
+            border-radius: 6px;
+            transition: width 1s linear;
+        }
+
+        /* ফুল স্ক্রিন স্ক্যানিং অ্যানিমেশন (চার্টের ওপর স্ক্যানার) */
+        #tb-scan-overlay {
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            pointer-events: none; /* যাতে পেজে ক্লিক করা যায় */
+            inset: 0;
+            pointer-events: none;
             z-index: 9999998;
             display: none;
             overflow: hidden;
+            background: rgba(0, 201, 255, 0.04);
         }
-        .tb-scan-line {
+        .tb-scan-laser {
             position: absolute;
+            left: 0;
             width: 100%;
-            height: 150px;
-            background: linear-gradient(to bottom, rgba(0,201,255,0) 0%, rgba(0,201,255,0.1) 80%, rgba(0,201,255,0.6) 100%);
-            border-bottom: 3px solid #00c9ff;
-            box-shadow: 0 5px 20px rgba(0, 201, 255, 0.7);
-            animation: scanSweep 1.5s ease-in-out infinite alternate;
+            height: 120px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 255, 170, 0.25), rgba(0, 201, 255, 0.75));
+            border-bottom: 3px solid #00ffcc;
+            box-shadow: 0 8px 30px rgba(0, 255, 204, 0.8);
+            animation: tbLaserMove 1.1s ease-in-out infinite alternate;
         }
-        @keyframes scanSweep {
-            0% { top: -150px; }
+        .tb-scan-grid {
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 201, 255, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 201, 255, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .tb-scan-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(13, 27, 42, 0.92);
+            border: 2px solid #00ffcc;
+            color: #00ffcc;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            box-shadow: 0 0 35px rgba(0, 255, 204, 0.5);
+            animation: tbPulse 0.8s infinite alternate;
+        }
+        @keyframes tbLaserMove {
+            0% { top: -120px; }
             100% { top: 100%; }
+        }
+        @keyframes tbPulse {
+            from { transform: translate(-50%, -50%) scale(0.95); opacity: 0.85; }
+            to { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
         }
     `;
     document.head.appendChild(style);
 
-    // ২. HTML এলিমেন্ট তৈরি করা
+    // ২. উইজেট এবং স্ক্যানার এলিমেন্ট তৈরি করা
     const widget = document.createElement('div');
     widget.id = 'floating-trading-bot-widget';
 
-    const logoBtn = document.createElement('div');
-    logoBtn.className = 'tb-logo-btn';
-    logoBtn.innerHTML = 'AUTO<br>BOT';
-
-    const panel = document.createElement('div');
-    panel.className = 'tb-panel';
-
-    panel.innerHTML = `
-        <div class="tb-header">
-            <span class="tb-title">Scanner Bot</span>
-            <span class="tb-close" id="tb-close-btn">✖</span>
+    widget.innerHTML = `
+        <div class="tb-panel" id="tb-main-panel">
+            <div class="tb-panel-header">
+                <span class="tb-panel-title">⚡ QUOTEX SIGNAL</span>
+                <span class="tb-panel-close" id="tb-panel-close">✖</span>
+            </div>
+            <div class="tb-time-row">
+                <span>Local Time:</span>
+                <span class="tb-time-val" id="tb-clock">00:00:00</span>
+            </div>
+            <button class="tb-analyse-btn" id="tb-scan-btn">🔍 ANALYSES CHART</button>
+            <div class="tb-signal-box" id="tb-sig-box">
+                <div class="tb-sig-label">1 Minute Candle Signal</div>
+                <div class="tb-sig-arrow" id="tb-sig-arrow">●</div>
+                <div class="tb-sig-text" id="tb-sig-text">READY</div>
+                <div class="tb-sig-sub" id="tb-sig-sub">Click Logo or Analyses to Scan</div>
+            </div>
+            <div class="tb-timer-wrap">
+                <div class="tb-timer-label">
+                    <span>⏱ Next Signal In</span>
+                    <span id="tb-timer-count">00:00</span>
+                </div>
+                <div class="tb-timer-bar-wrap">
+                    <div class="tb-timer-bar" id="tb-timer-bar" style="width: 100%;"></div>
+                </div>
+            </div>
         </div>
-        <div class="tb-time" id="tb-time">00:00:00</div>
-        
-        <button class="tb-analyze-btn" id="tb-analyze-btn">🔍 Analyze Market</button>
-        
-        <div class="tb-prediction-box" id="tb-prediction">WAIT</div>
+
+        <div class="tb-logo-wrapper" id="tb-logo-trigger">
+            <div class="tb-logo-circle">
+                <div class="tb-badge-close" id="tb-kill-btn" title="Remove Bot">✖</div>
+                <div class="tb-logo-inner-text">
+                    SITB
+                    <span>OFFICIAL</span>
+                </div>
+            </div>
+            <div class="tb-bot-label">SITB AUTO BOT</div>
+        </div>
     `;
 
-    // ফুল স্ক্রিন স্ক্যানার ওভারলে
     const scanOverlay = document.createElement('div');
-    scanOverlay.className = 'tb-scan-overlay';
     scanOverlay.id = 'tb-scan-overlay';
-    scanOverlay.innerHTML = `<div class="tb-scan-line"></div>`;
+    scanOverlay.innerHTML = `
+        <div class="tb-scan-grid"></div>
+        <div class="tb-scan-laser"></div>
+        <div class="tb-scan-badge">🔍 SCANNING CHART CANDLES...</div>
+    `;
 
-    widget.appendChild(logoBtn);
-    widget.appendChild(panel);
     document.body.appendChild(widget);
     document.body.appendChild(scanOverlay);
 
-    // ৩. Logic এবং Variables
+    // ৩. এলিমেন্ট রেফারেন্স এবং ভেরিয়েবল
+    const panel = document.getElementById('tb-main-panel');
+    const logoTrigger = document.getElementById('tb-logo-trigger');
+    const panelClose = document.getElementById('tb-panel-close');
+    const killBtn = document.getElementById('tb-kill-btn');
+    const scanBtn = document.getElementById('tb-scan-btn');
+    const clockEl = document.getElementById('tb-clock');
+    const sigBox = document.getElementById('tb-sig-box');
+    const sigArrow = document.getElementById('tb-sig-arrow');
+    const sigText = document.getElementById('tb-sig-text');
+    const sigSub = document.getElementById('tb-sig-sub');
+    const timerCount = document.getElementById('tb-timer-count');
+    const timerBar = document.getElementById('tb-timer-bar');
+
     let isPanelOpen = false;
     let isScanning = false;
-    let cachedPrediction = null;
-    let lastScanMinute = -1;
+    let currentMinuteKey = '';
+    let currentSignal = null;
 
-    const timeEl = document.getElementById('tb-time');
-    const predEl = document.getElementById('tb-prediction');
-    const analyzeBtn = document.getElementById('tb-analyze-btn');
-    const closeBtn = document.getElementById('tb-close-btn');
-    const overlay = document.getElementById('tb-scan-overlay');
+    // মিনিট অনুযায়ী ইউনিক কী তৈরি (যাতে একই মিনিটে একই সিগন্যাল থাকে)
+    function getMinuteKey(date) {
+        return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}`;
+    }
 
-    // ঘড়ি আপডেট করা
-    function updateClock() {
+    // সিগন্যাল ডিসপ্লে আপডেট
+    function renderSignal(signal, minuteFormatted) {
+        const isUp = signal === 'UP';
+        sigBox.className = 'tb-signal-box ' + (isUp ? 'up' : 'down');
+        sigArrow.textContent = isUp ? '▲' : '▼';
+        sigText.textContent = isUp ? 'UP' : 'DOWN';
+        sigSub.textContent = `Synced for ${minuteFormatted} (Random Indicator)`;
+    }
+
+    // স্ক্রিন স্ক্যান এবং সিগন্যাল জেনারেট ফাংশন
+    function runChartScan() {
+        if (isScanning) return;
+        isScanning = true;
+
+        scanOverlay.style.display = 'block';
+        scanBtn.disabled = true;
+        scanBtn.textContent = '⏳ SCANNING...';
+        sigText.textContent = 'SCANNING';
+        sigArrow.textContent = '⚡';
+        sigBox.className = 'tb-signal-box';
+
+        setTimeout(() => {
+            scanOverlay.style.display = 'none';
+            isScanning = false;
+            scanBtn.disabled = false;
+            scanBtn.textContent = '🔍 SCAN AGAIN';
+
+            const now = new Date();
+            const minKey = getMinuteKey(now);
+
+            // ওই মিনিটে আগে সিগন্যাল তৈরি না হয়ে থাকলে নতুন Random UP/DOWN তৈরি করবে
+            if (currentMinuteKey !== minKey || !currentSignal) {
+                currentMinuteKey = minKey;
+                currentSignal = Math.random() >= 0.5 ? 'UP' : 'DOWN';
+            }
+
+            const h = String(now.getHours() % 12 || 12).padStart(2, '0');
+            const m = String(now.getMinutes()).padStart(2, '0');
+            const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
+            renderSignal(currentSignal, `${h}:${m} ${ampm}`);
+        }, 2200);
+    }
+
+    // প্রতি সেকেন্ডে ঘড়ি, কাউন্টডাউন এবং নতুন মিনিটের অটো-আপডেট
+    const botInterval = setInterval(() => {
+        if (!document.getElementById('floating-trading-bot-widget')) {
+            clearInterval(botInterval);
+            return;
+        }
+
         const now = new Date();
         const h = String(now.getHours() % 12 || 12).padStart(2, '0');
         const m = String(now.getMinutes()).padStart(2, '0');
         const s = String(now.getSeconds()).padStart(2, '0');
         const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-        timeEl.innerText = `${h}:${m}:${s} ${ampm}`;
-        
-        // নতুন মিনিট শুরু হলে Prediction রিসেট করা
-        if (now.getMinutes() !== lastScanMinute && !isScanning && cachedPrediction) {
-            predEl.innerText = "WAIT";
-            predEl.className = 'tb-prediction-box';
-            cachedPrediction = null;
+
+        clockEl.textContent = `${h}:${m}:${s} ${ampm}`;
+
+        const secLeft = 60 - now.getSeconds();
+        timerCount.textContent = `00:${String(secLeft).padStart(2, '0')}`;
+        timerBar.style.width = `${(secLeft / 60) * 100}%`;
+
+        // নতুন মিনিট শুরু হলে স্বয়ংক্রিয়ভাবে নতুন মিনিটের সিগন্যাল আপডেট হওয়া
+        const minKey = getMinuteKey(now);
+        if (currentSignal && currentMinuteKey !== minKey && !isScanning) {
+            currentMinuteKey = minKey;
+            currentSignal = Math.random() >= 0.5 ? 'UP' : 'DOWN';
+            renderSignal(currentSignal, `${h}:${m} ${ampm}`);
         }
-    }
-    setInterval(updateClock, 1000);
-    updateClock();
+    }, 1000);
 
-    // স্ক্যানিং এবং সিগন্যাল তৈরি লজিক
-    analyzeBtn.addEventListener('click', () => {
-        const now = new Date();
-        const currentMinute = now.getMinutes();
-
-        // স্ক্যান অ্যানিমেশন শুরু
-        isScanning = true;
-        analyzeBtn.disabled = true;
-        analyzeBtn.innerText = "⏳ SCANNING...";
-        overlay.style.display = 'block';
-        
-        predEl.innerText = "---";
-        predEl.className = 'tb-prediction-box';
-
-        setTimeout(() => {
-            // অ্যানিমেশন শেষ
-            isScanning = false;
-            overlay.style.display = 'none';
-            analyzeBtn.disabled = false;
-            analyzeBtn.innerText = "🔍 ANALYZE AGAIN";
-
-            // যদি একই মিনিটে আগে স্ক্যান করা থাকে, তবে আগেরটাই দেখাবে
-            if (currentMinute === lastScanMinute && cachedPrediction) {
-                applyPrediction(cachedPrediction);
-            } else {
-                // নতুন সিগন্যাল (Random UP/DOWN)
-                lastScanMinute = currentMinute;
-                cachedPrediction = Math.random() > 0.5 ? "UP" : "DOWN";
-                applyPrediction(cachedPrediction);
-            }
-        }, 3000); // ৩ সেকেন্ড স্ক্যানিং চলবে
-    });
-
-    function applyPrediction(signal) {
-        predEl.innerText = signal + (signal === "UP" ? " ▲" : " ▼");
-        if (signal === "UP") {
-            predEl.className = 'tb-prediction-box tb-up';
-        } else {
-            predEl.className = 'tb-prediction-box tb-down';
-        }
-    }
-
-    // ৪. Draggable (সরানো) লজিক
+    // ৪. ড্র্যাগ (স্থান পরিবর্তন) এবং ক্লিক ইভেন্ট
+    let isDragging = false;
     let hasMoved = false;
-    let isMouseDown = false;
-    let startX, startY, initialX, initialY;
+    let startX, startY, initLeft, initTop;
 
-    function dragStart(e) {
-        isMouseDown = true;
+    function startDrag(e) {
+        if (e.target === killBtn) return;
+        isDragging = true;
         hasMoved = false;
-        const event = e.type.includes('mouse') ? e : e.touches[0];
-        startX = event.clientX;
-        startY = event.clientY;
-        initialX = widget.offsetLeft;
-        initialY = widget.offsetTop;
+        const pt = e.type.includes('mouse') ? e : e.touches[0];
+        startX = pt.clientX;
+        startY = pt.clientY;
+        const rect = widget.getBoundingClientRect();
+        initLeft = rect.left;
+        initTop = rect.top;
     }
 
-    function drag(e) {
-        if (!isMouseDown) return;
-        const event = e.type.includes('mouse') ? e : e.touches[0];
-        const dx = event.clientX - startX;
-        const dy = event.clientY - startY;
+    function moveDrag(e) {
+        if (!isDragging) return;
+        const pt = e.type.includes('mouse') ? e : e.touches[0];
+        const dx = pt.clientX - startX;
+        const dy = pt.clientY - startY;
 
-        if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+        if (Math.abs(dx) > 6 || Math.abs(dy) > 6) {
             hasMoved = true;
-            widget.style.left = `${initialX + dx}px`;
-            widget.style.top = `${initialY + dy}px`;
-            widget.style.right = 'auto'; 
-            if(e.type === 'touchmove') e.preventDefault();
+            widget.style.left = `${initLeft + dx}px`;
+            widget.style.top = `${initTop + dy}px`;
+            widget.style.right = 'auto';
+            widget.style.bottom = 'auto';
+            if (e.cancelable) e.preventDefault();
         }
     }
 
-    function dragEnd() {
-        isMouseDown = false;
+    function stopDrag() {
+        isDragging = false;
     }
 
-    logoBtn.addEventListener('mousedown', dragStart);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', dragEnd);
+    logoTrigger.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', moveDrag);
+    document.addEventListener('mouseup', stopDrag);
 
-    logoBtn.addEventListener('touchstart', dragStart, {passive: false});
-    document.addEventListener('touchmove', drag, {passive: false});
-    document.addEventListener('touchend', dragEnd);
+    logoTrigger.addEventListener('touchstart', startDrag, { passive: false });
+    document.addEventListener('touchmove', moveDrag, { passive: false });
+    document.addEventListener('touchend', stopDrag);
 
-    // প্যানেল খোলা এবং বন্ধ করা
-    logoBtn.addEventListener('click', () => {
+    // লোগোতে ক্লিক করলে প্যানেল খুলবে এবং স্ক্যান শুরু করবে
+    logoTrigger.addEventListener('click', (e) => {
+        if (e.target === killBtn) return;
         if (hasMoved) {
-            hasMoved = false; 
+            hasMoved = false;
             return;
         }
         isPanelOpen = !isPanelOpen;
         panel.style.display = isPanelOpen ? 'block' : 'none';
+        if (isPanelOpen) {
+            runChartScan();
+        }
     });
 
-    closeBtn.addEventListener('click', () => {
+    scanBtn.addEventListener('click', runChartScan);
+
+    panelClose.addEventListener('click', () => {
         isPanelOpen = false;
         panel.style.display = 'none';
     });
 
+    // লোগোর ওপরের ছোট লাল ✖ বাটনে ক্লিক করলে প্যানেল হাইড বা পুরো উইজেট বন্ধ হবে
+    killBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (isPanelOpen) {
+            isPanelOpen = false;
+            panel.style.display = 'none';
+        } else {
+            widget.remove();
+            scanOverlay.remove();
+        }
+    });
 })();
