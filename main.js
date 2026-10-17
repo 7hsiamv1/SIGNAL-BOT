@@ -1,5 +1,5 @@
 (function() {
-    // আগে থেকে কোনো উইজেট থাকলে সেটি মুছে নতুন আপডেট লোড করবে (একাধিক উইজেট তৈরি হবে না)
+    // আগে থেকে কোনো উইজেট থাকলে সেটি মুছে নতুন আপডেট লোড করবে
     const oldWidget = document.getElementById('floating-trading-bot-widget');
     if (oldWidget) oldWidget.remove();
     const oldOverlay = document.getElementById('tb-scan-overlay');
@@ -7,14 +7,14 @@
     const oldStyle = document.getElementById('tb-bot-styles');
     if (oldStyle) oldStyle.remove();
 
-    // ১. CSS স্টাইল (ভিডিওর নিয়ন বাটন + স্ক্রিন স্ক্যানার + আপনার কোডের সিগন্যাল প্যানেল)
+    // ১. CSS স্টাইল
     const style = document.createElement('style');
     style.id = 'tb-bot-styles';
     style.innerHTML = `
         #floating-trading-bot-widget {
             position: fixed;
-            top: 55%;
-            right: 25px;
+            top: 22%;
+            right: 20px;
             z-index: 9999999;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
@@ -23,7 +23,7 @@
             align-items: center;
         }
 
-        /* ভিডিওর মতো রাউন্ড লোগো বাটন */
+        /* রাউন্ড লোগো বাটন */
         .tb-logo-wrapper {
             position: relative;
             display: flex;
@@ -35,8 +35,8 @@
             cursor: grabbing;
         }
         .tb-logo-circle {
-            width: 72px;
-            height: 72px;
+            width: 68px;
+            height: 68px;
             border-radius: 50%;
             background: radial-gradient(circle, #2a0808 0%, #0a0e1a 80%);
             border: 3.5px solid #00ff66;
@@ -89,8 +89,8 @@
             z-index: 2;
         }
         .tb-bot-label {
-            margin-top: 6px;
-            font-size: 11px;
+            margin-top: 5px;
+            font-size: 10px;
             font-weight: 900;
             color: #c8ff00;
             text-shadow: 0 2px 4px #000, 0 0 10px rgba(200, 255, 0, 0.5);
@@ -99,23 +99,23 @@
             white-space: nowrap;
         }
 
-        /* মেইন সিগন্যাল প্যানেল */
+        /* ছোট ও কম্প্যাক্ট সিগন্যাল প্যানেল (বাটনের নিচে) */
         .tb-panel {
             display: none;
             position: absolute;
-            bottom: 105px;
+            top: 92px;
             right: 0;
-            width: 260px;
+            width: 185px;
             background: #0d1b2a;
             border: 1px solid #00c9ff66;
-            border-radius: 14px;
-            padding: 16px;
+            border-radius: 10px;
+            padding: 10px;
             color: #e0e6f0;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 201, 255, 0.2);
-            animation: tbPopIn 0.25s ease-out;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), 0 0 15px rgba(0, 201, 255, 0.2);
+            animation: tbPopIn 0.2s ease-out;
         }
         @keyframes tbPopIn {
-            from { opacity: 0; transform: scale(0.9) translateY(10px); }
+            from { opacity: 0; transform: scale(0.92) translateY(-8px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
         .tb-panel-header {
@@ -123,20 +123,20 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #1e3a5f;
-            padding-bottom: 10px;
-            margin-bottom: 12px;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
         }
         .tb-panel-title {
-            font-size: 14px;
+            font-size: 11px;
             font-weight: 800;
             color: #00c9ff;
-            letter-spacing: 1.5px;
-            text-shadow: 0 0 12px #00c9ff66;
+            letter-spacing: 1px;
+            text-shadow: 0 0 10px #00c9ff66;
         }
         .tb-panel-close {
             cursor: pointer;
             color: #7a9abf;
-            font-size: 15px;
+            font-size: 13px;
             font-weight: bold;
         }
         .tb-panel-close:hover {
@@ -146,12 +146,12 @@
         .tb-time-row {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 10px;
             color: #7a9abf;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             background: #111e30;
-            padding: 6px 10px;
-            border-radius: 8px;
+            padding: 4px 8px;
+            border-radius: 6px;
             border: 1px solid #1e3a5f;
         }
         .tb-time-val {
@@ -161,19 +161,19 @@
 
         .tb-analyse-btn {
             width: 100%;
-            padding: 12px;
-            font-size: 13px;
+            padding: 8px;
+            font-size: 10.5px;
             font-weight: 700;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             background: linear-gradient(135deg, #005b8e, #0099cc);
             color: #fff;
             border: none;
-            border-radius: 10px;
+            border-radius: 7px;
             cursor: pointer;
             text-transform: uppercase;
             transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.25);
-            margin-bottom: 12px;
+            box-shadow: 0 3px 10px rgba(0, 201, 255, 0.25);
+            margin-bottom: 8px;
         }
         .tb-analyse-btn:hover {
             background: linear-gradient(135deg, #006fa8, #00b8f0);
@@ -185,88 +185,88 @@
             box-shadow: none;
         }
 
-        /* সিগন্যাল বক্স (UP / DOWN) */
+        /* ছোট সিগন্যাল বক্স (UP / DOWN) */
         .tb-signal-box {
-            border-radius: 12px;
-            padding: 16px 12px;
+            border-radius: 8px;
+            padding: 10px 6px;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
             border: 1px solid #1e3a5f;
             background: #111e30;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             transition: all 0.3s;
         }
         .tb-signal-box.up {
             background: #0a2e1a;
             border-color: #27ae60;
-            box-shadow: 0 0 25px rgba(39, 174, 96, 0.3);
+            box-shadow: 0 0 18px rgba(39, 174, 96, 0.3);
         }
         .tb-signal-box.down {
             background: #2e0a0a;
             border-color: #e74c3c;
-            box-shadow: 0 0 25px rgba(231, 76, 60, 0.3);
+            box-shadow: 0 0 18px rgba(231, 76, 60, 0.3);
         }
         .tb-sig-label {
-            font-size: 10px;
-            letter-spacing: 1.5px;
+            font-size: 8.5px;
+            letter-spacing: 1px;
             color: #7a9abf;
             text-transform: uppercase;
         }
         .tb-sig-arrow {
-            font-size: 44px;
+            font-size: 28px;
             line-height: 1;
-            margin: 4px 0;
+            margin: 2px 0;
             color: #4a6a8a;
         }
         .tb-signal-box.up .tb-sig-arrow {
             color: #2ecc71;
-            text-shadow: 0 0 20px rgba(46, 204, 113, 0.6);
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.6);
         }
         .tb-signal-box.down .tb-sig-arrow {
             color: #e74c3c;
-            text-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+            text-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
         }
         .tb-sig-text {
-            font-size: 22px;
+            font-size: 16px;
             font-weight: 800;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             color: #7a9abf;
         }
         .tb-signal-box.up .tb-sig-text { color: #2ecc71; }
         .tb-signal-box.down .tb-sig-text { color: #e74c3c; }
         .tb-sig-sub {
-            font-size: 10px;
+            font-size: 8px;
             color: #5a7a9a;
         }
 
         /* টাইমার প্রগ্রেস বার */
         .tb-timer-label {
-            font-size: 10px;
-            letter-spacing: 1px;
+            font-size: 9px;
+            letter-spacing: 0.5px;
             color: #7a9abf;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             text-transform: uppercase;
             display: flex;
             justify-content: space-between;
         }
         .tb-timer-bar-wrap {
             background: #111e30;
-            border-radius: 6px;
-            height: 7px;
+            border-radius: 5px;
+            height: 5px;
             overflow: hidden;
             border: 1px solid #1e3a5f;
         }
         .tb-timer-bar {
             height: 100%;
             background: linear-gradient(90deg, #005b8e, #00c9ff);
-            border-radius: 6px;
+            border-radius: 5px;
             transition: width 1s linear;
         }
 
-        /* ফুল স্ক্রিন স্ক্যানিং অ্যানিমেশন (চার্টের ওপর স্ক্যানার) */
+        /* ফুল স্ক্রিন স্ক্যানিং অ্যানিমেশন (মাঝখানের লেখা ছাড়া) */
         #tb-scan-overlay {
             position: fixed;
             inset: 0;
@@ -274,7 +274,7 @@
             z-index: 9999998;
             display: none;
             overflow: hidden;
-            background: rgba(0, 201, 255, 0.04);
+            background: rgba(0, 201, 255, 0.03);
         }
         .tb-scan-laser {
             position: absolute;
@@ -294,31 +294,9 @@
                 linear-gradient(90deg, rgba(0, 201, 255, 0.08) 1px, transparent 1px);
             background-size: 40px 40px;
         }
-        .tb-scan-badge {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(13, 27, 42, 0.92);
-            border: 2px solid #00ffcc;
-            color: #00ffcc;
-            padding: 14px 28px;
-            border-radius: 12px;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 16px;
-            font-weight: 800;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            box-shadow: 0 0 35px rgba(0, 255, 204, 0.5);
-            animation: tbPulse 0.8s infinite alternate;
-        }
         @keyframes tbLaserMove {
             0% { top: -120px; }
             100% { top: 100%; }
-        }
-        @keyframes tbPulse {
-            from { transform: translate(-50%, -50%) scale(0.95); opacity: 0.85; }
-            to { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
         }
     `;
     document.head.appendChild(style);
@@ -328,13 +306,24 @@
     widget.id = 'floating-trading-bot-widget';
 
     widget.innerHTML = `
+        <div class="tb-logo-wrapper" id="tb-logo-trigger">
+            <div class="tb-logo-circle">
+                <div class="tb-badge-close" id="tb-kill-btn" title="Remove Bot">✖</div>
+                <div class="tb-logo-inner-text">
+                    SITB
+                    <span>OFFICIAL</span>
+                </div>
+            </div>
+            <div class="tb-bot-label">SITB AUTO BOT</div>
+        </div>
+
         <div class="tb-panel" id="tb-main-panel">
             <div class="tb-panel-header">
                 <span class="tb-panel-title">⚡ QUOTEX SIGNAL</span>
                 <span class="tb-panel-close" id="tb-panel-close">✖</span>
             </div>
             <div class="tb-time-row">
-                <span>Local Time:</span>
+                <span>Time:</span>
                 <span class="tb-time-val" id="tb-clock">00:00:00</span>
             </div>
             <button class="tb-analyse-btn" id="tb-scan-btn">🔍 ANALYSES CHART</button>
@@ -342,7 +331,7 @@
                 <div class="tb-sig-label">1 Minute Candle Signal</div>
                 <div class="tb-sig-arrow" id="tb-sig-arrow">●</div>
                 <div class="tb-sig-text" id="tb-sig-text">READY</div>
-                <div class="tb-sig-sub" id="tb-sig-sub">Click Logo or Analyses to Scan</div>
+                <div class="tb-sig-sub" id="tb-sig-sub">Click Analyses to Scan</div>
             </div>
             <div class="tb-timer-wrap">
                 <div class="tb-timer-label">
@@ -354,17 +343,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="tb-logo-wrapper" id="tb-logo-trigger">
-            <div class="tb-logo-circle">
-                <div class="tb-badge-close" id="tb-kill-btn" title="Remove Bot">✖</div>
-                <div class="tb-logo-inner-text">
-                    SITB
-                    <span>OFFICIAL</span>
-                </div>
-            </div>
-            <div class="tb-bot-label">SITB AUTO BOT</div>
-        </div>
     `;
 
     const scanOverlay = document.createElement('div');
@@ -372,7 +350,6 @@
     scanOverlay.innerHTML = `
         <div class="tb-scan-grid"></div>
         <div class="tb-scan-laser"></div>
-        <div class="tb-scan-badge">🔍 SCANNING CHART CANDLES...</div>
     `;
 
     document.body.appendChild(widget);
@@ -396,10 +373,35 @@
     let isScanning = false;
     let currentMinuteKey = '';
     let currentSignal = null;
+    let lastSignal = null;
+    let streakCount = 0;
 
-    // মিনিট অনুযায়ী ইউনিক কী তৈরি (যাতে একই মিনিটে একই সিগন্যাল থাকে)
     function getMinuteKey(date) {
         return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}`;
+    }
+
+    // উন্নত Random ফাংশন (একটানা ২ বারের বেশি একই সিগন্যাল আসবে না)
+    function generateBalancedRandom() {
+        let pick;
+        if (window.crypto && window.crypto.getRandomValues) {
+            const arr = new Uint32Array(1);
+            window.crypto.getRandomValues(arr);
+            pick = (arr[0] % 2 === 0) ? 'UP' : 'DOWN';
+        } else {
+            pick = Math.random() >= 0.5 ? 'UP' : 'DOWN';
+        }
+
+        if (pick === lastSignal) {
+            streakCount++;
+            if (streakCount >= 2) {
+                pick = (lastSignal === 'UP') ? 'DOWN' : 'UP';
+                streakCount = 1;
+            }
+        } else {
+            streakCount = 1;
+        }
+        lastSignal = pick;
+        return pick;
     }
 
     // সিগন্যাল ডিসপ্লে আপডেট
@@ -408,7 +410,7 @@
         sigBox.className = 'tb-signal-box ' + (isUp ? 'up' : 'down');
         sigArrow.textContent = isUp ? '▲' : '▼';
         sigText.textContent = isUp ? 'UP' : 'DOWN';
-        sigSub.textContent = `Synced for ${minuteFormatted} (Random Indicator)`;
+        sigSub.textContent = `Synced for ${minuteFormatted}`;
     }
 
     // স্ক্রিন স্ক্যান এবং সিগন্যাল জেনারেট ফাংশন
@@ -430,19 +432,14 @@
             scanBtn.textContent = '🔍 SCAN AGAIN';
 
             const now = new Date();
-            const minKey = getMinuteKey(now);
-
-            // ওই মিনিটে আগে সিগন্যাল তৈরি না হয়ে থাকলে নতুন Random UP/DOWN তৈরি করবে
-            if (currentMinuteKey !== minKey || !currentSignal) {
-                currentMinuteKey = minKey;
-                currentSignal = Math.random() >= 0.5 ? 'UP' : 'DOWN';
-            }
+            currentMinuteKey = getMinuteKey(now);
+            currentSignal = generateBalancedRandom();
 
             const h = String(now.getHours() % 12 || 12).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
             renderSignal(currentSignal, `${h}:${m} ${ampm}`);
-        }, 2200);
+        }, 2000);
     }
 
     // প্রতি সেকেন্ডে ঘড়ি, কাউন্টডাউন এবং নতুন মিনিটের অটো-আপডেট
@@ -464,11 +461,11 @@
         timerCount.textContent = `00:${String(secLeft).padStart(2, '0')}`;
         timerBar.style.width = `${(secLeft / 60) * 100}%`;
 
-        // নতুন মিনিট শুরু হলে স্বয়ংক্রিয়ভাবে নতুন মিনিটের সিগন্যাল আপডেট হওয়া
+        // নতুন মিনিট শুরু হলে স্বয়ংক্রিয়ভাবে নতুন সিগন্যাল আপডেট হওয়া
         const minKey = getMinuteKey(now);
         if (currentSignal && currentMinuteKey !== minKey && !isScanning) {
             currentMinuteKey = minKey;
-            currentSignal = Math.random() >= 0.5 ? 'UP' : 'DOWN';
+            currentSignal = generateBalancedRandom();
             renderSignal(currentSignal, `${h}:${m} ${ampm}`);
         }
     }, 1000);
@@ -539,7 +536,6 @@
         panel.style.display = 'none';
     });
 
-    // লোগোর ওপরের ছোট লাল ✖ বাটনে ক্লিক করলে প্যানেল হাইড বা পুরো উইজেট বন্ধ হবে
     killBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         if (isPanelOpen) {
