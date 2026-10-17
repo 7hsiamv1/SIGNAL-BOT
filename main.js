@@ -345,7 +345,7 @@
 
         <div class="tb-panel" id="tb-main-panel">
             <div class="tb-panel-header">
-                <span class="tb-panel-title">⚡ QUOTEX AUTO SIGNAL</span>
+                <span class="tb-panel-title">⚡ QUOTEX SIGNAL</span>
                 <span class="tb-panel-close" id="tb-panel-close">✖</span>
             </div>
             <div class="tb-time-row">
