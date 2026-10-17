@@ -1,4 +1,9 @@
 (function() {
+    // ====================================================
+    // এখানে আপনার লোগোর Direct Image URL বসান
+    // ====================================================
+    const CUSTOM_LOGO_URL = "https://i.ibb.co.com/CpKQ5qBP/IMG-20261017-192542-718.jpg";
+
     // আগে থেকে কোনো উইজেট থাকলে সেটি মুছে নতুন আপডেট লোড করবে
     const oldWidget = document.getElementById('floating-trading-bot-widget');
     if (oldWidget) oldWidget.remove();
@@ -52,6 +57,14 @@
             transform: scale(1.05);
             box-shadow: 0 0 25px rgba(0, 255, 102, 0.9);
         }
+        .tb-custom-logo-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            display: block;
+            pointer-events: none;
+        }
         .tb-logo-inner-text {
             background: #111;
             border: 1px solid #00c9ff;
@@ -88,15 +101,27 @@
             cursor: pointer;
             z-index: 2;
         }
+
+        /* নিচের টেক্সট (Rainbow Color Animation) */
         .tb-bot-label {
             margin-top: 5px;
             font-size: 10px;
             font-weight: 900;
-            color: #c8ff00;
-            text-shadow: 0 2px 4px #000, 0 0 10px rgba(200, 255, 0, 0.5);
+            background: linear-gradient(90deg, #ff0040, #ff8000, #ffff00, #00ff55, #00ffff, #bfff00, #ff00cc, #ff0040);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.95));
+            animation: tbRainbowMove 2.5s linear infinite;
             letter-spacing: 0.8px;
             text-transform: uppercase;
             white-space: nowrap;
+        }
+        @keyframes tbRainbowMove {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
         }
 
         /* ছোট ও কম্প্যাক্ট সিগন্যাল প্যানেল (বাটনের নিচে) */
@@ -309,17 +334,18 @@
         <div class="tb-logo-wrapper" id="tb-logo-trigger">
             <div class="tb-logo-circle">
                 <div class="tb-badge-close" id="tb-kill-btn" title="Remove Bot">✖</div>
-                <div class="tb-logo-inner-text">
-                    SITB
-                    <span>OFFICIAL</span>
+                <img src="${CUSTOM_LOGO_URL}" class="tb-custom-logo-img" id="tb-logo-img" alt="Logo">
+                <div class="tb-logo-inner-text" id="tb-logo-fallback" style="display: none;">
+                    CODER
+                    <span>SIAM</span>
                 </div>
             </div>
-            <div class="tb-bot-label">SITB AUTO BOT</div>
+            <div class="tb-bot-label">CODER SIAM BOT</div>
         </div>
 
         <div class="tb-panel" id="tb-main-panel">
             <div class="tb-panel-header">
-                <span class="tb-panel-title">⚡ QUOTEX SIGNAL</span>
+                <span class="tb-panel-title">⚡ QUOTEX AUTO SIGNAL</span>
                 <span class="tb-panel-close" id="tb-panel-close">✖</span>
             </div>
             <div class="tb-time-row">
@@ -354,6 +380,19 @@
 
     document.body.appendChild(widget);
     document.body.appendChild(scanOverlay);
+
+    // কাস্টম লোগো URL ভুল থাকলে বা লোড না হলে ডিফল্ট টেক্সট লোগো দেখাবে
+    const logoImgEl = document.getElementById('tb-logo-img');
+    const logoFallbackEl = document.getElementById('tb-logo-fallback');
+    if (!CUSTOM_LOGO_URL || CUSTOM_LOGO_URL === "https://your-image-link.com/logo.png") {
+        logoImgEl.style.display = 'none';
+        logoFallbackEl.style.display = 'block';
+    } else {
+        logoImgEl.onerror = () => {
+            logoImgEl.style.display = 'none';
+            logoFallbackEl.style.display = 'block';
+        };
+    }
 
     // ৩. এলিমেন্ট রেফারেন্স এবং ভেরিয়েবল
     const panel = document.getElementById('tb-main-panel');
