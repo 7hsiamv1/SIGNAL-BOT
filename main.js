@@ -308,7 +308,7 @@
             height: 100%;
             background: linear-gradient(90deg, #005b8e, #00c9ff);
             border-radius: 5px;
-            transition: width 1s linear;
+            transition: width 0.1s linear; /* রিয়েল টাইম স্মুথনেস এর জন্য 0.1s করা হয়েছে */
         }
 
         /* ফুল স্ক্রিন স্ক্যানিং অ্যানিমেশন (মাঝখানের লেখা ছাড়া) */
@@ -409,7 +409,6 @@
     document.body.appendChild(widget);
     document.body.appendChild(scanOverlay);
 
-    // কাস্টম লোগো URL ভুল থাকলে বা লোড না হলে ডিফল্ট টেক্সট লোগো দেখাবে
     const logoImgEl = document.getElementById('tb-logo-img');
     const logoFallbackEl = document.getElementById('tb-logo-fallback');
     if (!CUSTOM_LOGO_URL || CUSTOM_LOGO_URL === "https://your-image-link.com/logo.png") {
@@ -446,7 +445,7 @@
 
     // Lock System Variables
     let lockedUntil = 0; 
-    let activeTimeframe = 60000; // ডিফল্ট ১ মিনিট (ms)
+    let activeTimeframe = 60000; 
     let activeTimeframeLabel = '1 Minute';
 
     // প্রকৃত Random ফাংশন
@@ -505,14 +504,18 @@
 
             const nowMs = Date.now();
 
-            // লজিক: যদি নতুন টাইমফ্রেম সিলেক্ট করা হয়, অথবা আগের টাইম শেষ হয়ে যায়, বা প্রথমবার ক্লিক করে
             if (selectedTimeMs !== activeTimeframe || nowMs >= lockedUntil || !currentSignal) {
                 currentSignal = generateTrueRandom();
                 activeTimeframe = selectedTimeMs;
                 activeTimeframeLabel = selectedLabel;
-                lockedUntil = nowMs + activeTimeframe; // নতুন সময়ের জন্য সিগন্যাল লক
+                
+                // রিয়েল টাইম ক্যান্ডেল বাউন্ডারির সাথে সিংক করা (যেমন ঘড়ির ঠিক ০০ সেকেন্ডে)
+                let nextBoundary = Math.ceil(nowMs / activeTimeframe) * activeTimeframe;
+                if (nextBoundary - nowMs < 1000) {
+                    nextBoundary += activeTimeframe; // যদি সময় ১ সেকেন্ডের কম থাকে, তাহলে পরের ক্যান্ডেলে শিফট হবে
+                }
+                lockedUntil = nextBoundary;
             } 
-            // অন্যথায়: আগের সিগন্যাল এবং টাইমার লকই থাকবে, শুধু ডিসপ্লে আপডেট হবে
 
             sigLabel.textContent = `${activeTimeframeLabel} Signal`;
 
@@ -521,10 +524,10 @@
             const m = String(now.getMinutes()).padStart(2, '0');
             const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
             renderSignal(currentSignal, `${h}:${m} ${ampm}`);
-        }, 2000); // ২ সেকেন্ড স্ক্যানিং অ্যানিমেশন
+        }, 2000);
     }
 
-    // প্রতি সেকেন্ডে ঘড়ি এবং লক টাইমার প্রগ্রেস আপডেট
+    // প্রতি ১০০ মিলি-সেকেন্ডে ঘড়ি এবং লক টাইমার প্রগ্রেস আপডেট (রিয়েল টাইম স্মুথনেস)
     const botInterval = setInterval(() => {
         if (!document.getElementById('floating-trading-bot-widget')) {
             clearInterval(botInterval);
@@ -561,12 +564,12 @@
         // নির্দিষ্ট লক টাইম শেষ হলে অটোমেটিকভাবে নতুন সিগন্যাল আপডেট হওয়া
         if (currentSignal && nowMs >= lockedUntil && !isScanning) {
             currentSignal = generateTrueRandom();
-            lockedUntil = nowMs + activeTimeframe; // পুনরায় একই টাইমফ্রেমের জন্য লক
+            lockedUntil = lockedUntil + activeTimeframe; // রিয়েল টাইম ক্যান্ডেল অনুযায়ী পরবর্তী লক
             
             sigLabel.textContent = `${activeTimeframeLabel} Signal`;
             renderSignal(currentSignal, `${h}:${m} ${ampm}`);
         }
-    }, 1000);
+    }, 100);
 
     // ৪. ড্র্যাগ (স্থান পরিবর্তন) এবং ক্লিক ইভেন্ট
     let isDragging = false;
@@ -613,7 +616,6 @@
     document.addEventListener('touchmove', moveDrag, { passive: false });
     document.addEventListener('touchend', stopDrag);
 
-    // লোগোতে ক্লিক করলে প্যানেল খুলবে এবং স্ক্যান শুরু করবে
     logoTrigger.addEventListener('click', (e) => {
         if (e.target === killBtn) return;
         if (hasMoved) {
@@ -622,7 +624,6 @@
         }
         isPanelOpen = !isPanelOpen;
         panel.style.display = isPanelOpen ? 'block' : 'none';
-        // প্রথমবার প্যানেল ওপেন হলে স্ক্যান শুরু হবে
         if (isPanelOpen && !currentSignal) {
             runChartScan();
         }
