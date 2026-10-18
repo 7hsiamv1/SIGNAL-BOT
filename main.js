@@ -184,6 +184,26 @@
             font-weight: 700;
         }
 
+        /* টাইমফ্রেম সিলেক্টর */
+        .tb-timeframe-selector {
+            width: 100%;
+            background: #111e30;
+            color: #00c9ff;
+            border: 1px solid #1e3a5f;
+            border-radius: 6px;
+            padding: 6px;
+            font-size: 11px;
+            margin-bottom: 8px;
+            outline: none;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        .tb-timeframe-selector option {
+            background: #0d1b2a;
+            color: #e0e6f0;
+        }
+
         .tb-analyse-btn {
             width: 100%;
             padding: 8px;
@@ -352,9 +372,17 @@
                 <span>Time:</span>
                 <span class="tb-time-val" id="tb-clock">00:00:00</span>
             </div>
+            
+            <select class="tb-timeframe-selector" id="tb-timeframe-select">
+                <option value="5000">5 Seconds</option>
+                <option value="30000">30 Seconds</option>
+                <option value="60000" selected>1 Minute</option>
+                <option value="300000">5 Minutes</option>
+            </select>
+
             <button class="tb-analyse-btn" id="tb-scan-btn">🔍 ANALYSES CHART</button>
             <div class="tb-signal-box" id="tb-sig-box">
-                <div class="tb-sig-label">1 Minute Candle Signal</div>
+                <div class="tb-sig-label" id="tb-sig-label">1 Minute Signal</div>
                 <div class="tb-sig-arrow" id="tb-sig-arrow">●</div>
                 <div class="tb-sig-text" id="tb-sig-text">READY</div>
                 <div class="tb-sig-sub" id="tb-sig-sub">Click Analyses to Scan</div>
@@ -402,24 +430,26 @@
     const scanBtn = document.getElementById('tb-scan-btn');
     const clockEl = document.getElementById('tb-clock');
     const sigBox = document.getElementById('tb-sig-box');
+    const sigLabel = document.getElementById('tb-sig-label');
     const sigArrow = document.getElementById('tb-sig-arrow');
     const sigText = document.getElementById('tb-sig-text');
     const sigSub = document.getElementById('tb-sig-sub');
     const timerCount = document.getElementById('tb-timer-count');
     const timerBar = document.getElementById('tb-timer-bar');
+    const timeframeSelect = document.getElementById('tb-timeframe-select');
 
     let isPanelOpen = false;
     let isScanning = false;
-    let currentMinuteKey = '';
     let currentSignal = null;
     let lastSignal = null;
     let streakCount = 0;
 
-    function getMinuteKey(date) {
-        return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}-${date.getHours()}-${date.getMinutes()}`;
-    }
+    // Lock System Variables
+    let lockedUntil = 0; 
+    let activeTimeframe = 60000; // ডিফল্ট ১ মিনিট (ms)
+    let activeTimeframeLabel = '1 Minute';
 
-    // প্রকৃত Random ফাংশন (রোবটের মতো UP-DOWN-UP-DOWN করবে না, আবার একটানা ৩ বারের বেশি একই সিগন্যালও দেবে না)
+    // প্রকৃত Random ফাংশন
     function generateTrueRandom() {
         let pick;
         if (window.crypto && window.crypto.getRandomValues) {
@@ -452,10 +482,13 @@
         sigSub.textContent = `Synced for ${minuteFormatted}`;
     }
 
-    // স্ক্রিন স্ক্যান এবং সিগন্যাল জেনারেট ফাংশন (একই মিনিটে সিগন্যাল পরিবর্তন হবে না)
+    // স্ক্রিন স্ক্যান এবং সিগন্যাল জেনারেট/লক ফাংশন
     function runChartScan() {
         if (isScanning) return;
         isScanning = true;
+
+        const selectedTimeMs = parseInt(timeframeSelect.value);
+        const selectedLabel = timeframeSelect.options[timeframeSelect.selectedIndex].text;
 
         scanOverlay.style.display = 'block';
         scanBtn.disabled = true;
@@ -470,23 +503,28 @@
             scanBtn.disabled = false;
             scanBtn.textContent = '🔍 SCAN AGAIN';
 
-            const now = new Date();
-            const minKey = getMinuteKey(now);
+            const nowMs = Date.now();
 
-            // শুধুমাত্র নতুন মিনিট হলেই নতুন সিগন্যাল তৈরি হবে, একই মিনিটে ক্লিক করলে ওই মিনিটের সিগন্যালই থাকবে
-            if (currentMinuteKey !== minKey || !currentSignal) {
-                currentMinuteKey = minKey;
+            // লজিক: যদি নতুন টাইমফ্রেম সিলেক্ট করা হয়, অথবা আগের টাইম শেষ হয়ে যায়, বা প্রথমবার ক্লিক করে
+            if (selectedTimeMs !== activeTimeframe || nowMs >= lockedUntil || !currentSignal) {
                 currentSignal = generateTrueRandom();
-            }
+                activeTimeframe = selectedTimeMs;
+                activeTimeframeLabel = selectedLabel;
+                lockedUntil = nowMs + activeTimeframe; // নতুন সময়ের জন্য সিগন্যাল লক
+            } 
+            // অন্যথায়: আগের সিগন্যাল এবং টাইমার লকই থাকবে, শুধু ডিসপ্লে আপডেট হবে
 
+            sigLabel.textContent = `${activeTimeframeLabel} Signal`;
+
+            const now = new Date();
             const h = String(now.getHours() % 12 || 12).padStart(2, '0');
             const m = String(now.getMinutes()).padStart(2, '0');
             const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
             renderSignal(currentSignal, `${h}:${m} ${ampm}`);
-        }, 2000);
+        }, 2000); // ২ সেকেন্ড স্ক্যানিং অ্যানিমেশন
     }
 
-    // প্রতি সেকেন্ডে ঘড়ি, কাউন্টডাউন এবং নতুন মিনিটের অটো-আপডেট
+    // প্রতি সেকেন্ডে ঘড়ি এবং লক টাইমার প্রগ্রেস আপডেট
     const botInterval = setInterval(() => {
         if (!document.getElementById('floating-trading-bot-widget')) {
             clearInterval(botInterval);
@@ -494,22 +532,38 @@
         }
 
         const now = new Date();
+        const nowMs = now.getTime();
+        
+        // ঘড়ি আপডেট
         const h = String(now.getHours() % 12 || 12).padStart(2, '0');
         const m = String(now.getMinutes()).padStart(2, '0');
         const s = String(now.getSeconds()).padStart(2, '0');
         const ampm = now.getHours() >= 12 ? 'PM' : 'AM';
-
         clockEl.textContent = `${h}:${m}:${s} ${ampm}`;
 
-        const secLeft = 60 - now.getSeconds();
-        timerCount.textContent = `00:${String(secLeft).padStart(2, '0')}`;
-        timerBar.style.width = `${(secLeft / 60) * 100}%`;
+        // লক টাইমার হিসাব
+        let remainingMs = lockedUntil - nowMs;
+        if (remainingMs < 0) remainingMs = 0;
 
-        // নতুন মিনিট শুরু হলে স্বয়ংক্রিয়ভাবে নতুন সিগন্যাল আপডেট হওয়া
-        const minKey = getMinuteKey(now);
-        if (currentSignal && currentMinuteKey !== minKey && !isScanning) {
-            currentMinuteKey = minKey;
+        const remSecTotal = Math.ceil(remainingMs / 1000);
+        const remM = String(Math.floor(remSecTotal / 60)).padStart(2, '0');
+        const remS = String(remSecTotal % 60).padStart(2, '0');
+        
+        timerCount.textContent = `${remM}:${remS}`;
+        
+        // প্রগ্রেস বার পার্সেন্টেজ
+        let pct = 0;
+        if (activeTimeframe > 0) {
+            pct = (remainingMs / activeTimeframe) * 100;
+        }
+        timerBar.style.width = `${pct}%`;
+
+        // নির্দিষ্ট লক টাইম শেষ হলে অটোমেটিকভাবে নতুন সিগন্যাল আপডেট হওয়া
+        if (currentSignal && nowMs >= lockedUntil && !isScanning) {
             currentSignal = generateTrueRandom();
+            lockedUntil = nowMs + activeTimeframe; // পুনরায় একই টাইমফ্রেমের জন্য লক
+            
+            sigLabel.textContent = `${activeTimeframeLabel} Signal`;
             renderSignal(currentSignal, `${h}:${m} ${ampm}`);
         }
     }, 1000);
@@ -568,7 +622,8 @@
         }
         isPanelOpen = !isPanelOpen;
         panel.style.display = isPanelOpen ? 'block' : 'none';
-        if (isPanelOpen) {
+        // প্রথমবার প্যানেল ওপেন হলে স্ক্যান শুরু হবে
+        if (isPanelOpen && !currentSignal) {
             runChartScan();
         }
     });
