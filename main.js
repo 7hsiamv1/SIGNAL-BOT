@@ -12,16 +12,18 @@
     const oldStyle = document.getElementById('tb-bot-styles');
     if (oldStyle) oldStyle.remove();
 
-    // ১. CSS স্টাইল
+    // ১. CSS স্টাইল (প্রোফেশনাল ও প্রিমিয়াম ডিজাইন)
     const style = document.createElement('style');
     style.id = 'tb-bot-styles';
     style.innerHTML = `
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+
         #floating-trading-bot-widget {
             position: fixed;
             top: 22%;
             right: 20px;
             z-index: 9999999;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
             display: flex;
             flex-direction: column;
@@ -40,22 +42,22 @@
             cursor: grabbing;
         }
         .tb-logo-circle {
-            width: 68px;
-            height: 68px;
+            width: 65px;
+            height: 65px;
             border-radius: 50%;
-            background: radial-gradient(circle, #2a0808 0%, #0a0e1a 80%);
-            border: 3.5px solid #00ff66;
-            box-shadow: 0 0 18px rgba(0, 255, 102, 0.6), inset 0 0 12px rgba(255, 0, 55, 0.5);
+            background: #0a0f1a;
+            border: 2px solid #00c9ff;
+            box-shadow: 0 0 15px rgba(0, 201, 255, 0.4), inset 0 0 10px rgba(0, 201, 255, 0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .tb-logo-circle:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 25px rgba(0, 255, 102, 0.9);
+            box-shadow: 0 0 20px rgba(0, 201, 255, 0.6);
         }
         .tb-custom-logo-img {
             width: 100%;
@@ -71,98 +73,95 @@
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 10px;
-            font-weight: 900;
+            font-weight: 800;
             color: #fff;
             letter-spacing: 0.5px;
             text-align: center;
             line-height: 1.1;
-            box-shadow: 0 0 8px rgba(0, 201, 255, 0.5);
         }
         .tb-logo-inner-text span {
-            color: #ff2a5f;
+            color: #00c9ff;
             font-size: 8px;
             display: block;
         }
         .tb-badge-close {
             position: absolute;
-            top: -2px;
-            right: -2px;
-            width: 20px;
-            height: 20px;
+            top: -4px;
+            right: -4px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
-            background: #ff2a75;
+            background: #e74c3c;
             color: #fff;
-            font-size: 11px;
-            font-weight: bold;
+            font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
             cursor: pointer;
             z-index: 2;
+            transition: background 0.2s;
+        }
+        .tb-badge-close:hover {
+            background: #c0392b;
         }
 
-        /* নিচের টেক্সট (Rainbow Color Animation) */
+        /* নিচের টেক্সট (Premium Gradient) */
         .tb-bot-label {
-            margin-top: 5px;
+            margin-top: 8px;
             font-size: 10px;
-            font-weight: 900;
-            background: linear-gradient(90deg, #ff0040, #ff8000, #ffff00, #00ff55, #00ffff, #bfff00, #ff00cc, #ff0040);
-            background-size: 200% auto;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00c9ff, #92fe9d);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             color: transparent;
-            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.95));
-            animation: tbRainbowMove 2.5s linear infinite;
-            letter-spacing: 0.8px;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+            letter-spacing: 1px;
             text-transform: uppercase;
             white-space: nowrap;
         }
-        @keyframes tbRainbowMove {
-            0% { background-position: 0% center; }
-            100% { background-position: 200% center; }
-        }
 
-        /* ছোট ও কম্প্যাক্ট সিগন্যাল প্যানেল (বাটনের নিচে) */
+        /* ছোট ও কম্প্যাক্ট সিগন্যাল প্যানেল (Glassmorphism Effect) */
         .tb-panel {
             display: none;
             position: absolute;
             top: 92px;
             right: 0;
-            width: 185px;
-            background: #0d1b2a;
-            border: 1px solid #00c9ff66;
-            border-radius: 10px;
-            padding: 10px;
+            width: 190px;
+            background: rgba(10, 15, 26, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 201, 255, 0.25);
+            border-radius: 12px;
+            padding: 12px;
             color: #e0e6f0;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.85), 0 0 15px rgba(0, 201, 255, 0.2);
-            animation: tbPopIn 0.2s ease-out;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(0, 201, 255, 0.1);
+            animation: tbPopIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes tbPopIn {
-            from { opacity: 0; transform: scale(0.92) translateY(-8px); }
+            from { opacity: 0; transform: scale(0.9) translateY(-10px); }
             to { opacity: 1; transform: scale(1) translateY(0); }
         }
         .tb-panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #1e3a5f;
-            padding-bottom: 6px;
-            margin-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 8px;
+            margin-bottom: 10px;
         }
         .tb-panel-title {
             font-size: 11px;
             font-weight: 800;
-            color: #00c9ff;
+            color: #ffffff;
             letter-spacing: 1px;
-            text-shadow: 0 0 10px #00c9ff66;
         }
         .tb-panel-close {
             cursor: pointer;
             color: #7a9abf;
-            font-size: 13px;
-            font-weight: bold;
+            font-size: 14px;
+            transition: color 0.2s;
         }
         .tb-panel-close:hover {
             color: #e74c3c;
@@ -172,146 +171,154 @@
             display: flex;
             justify-content: space-between;
             font-size: 10px;
-            color: #7a9abf;
-            margin-bottom: 8px;
-            background: #111e30;
-            padding: 4px 8px;
+            color: #a0aec0;
+            margin-bottom: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 6px 10px;
             border-radius: 6px;
-            border: 1px solid #1e3a5f;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .tb-time-val {
             color: #00c9ff;
-            font-weight: 700;
+            font-weight: 600;
         }
 
         /* টাইমফ্রেম সিলেক্টর */
         .tb-timeframe-selector {
             width: 100%;
-            background: #111e30;
+            background: rgba(0, 0, 0, 0.4);
             color: #00c9ff;
-            border: 1px solid #1e3a5f;
+            border: 1px solid rgba(0, 201, 255, 0.2);
             border-radius: 6px;
-            padding: 6px;
+            padding: 8px;
             font-size: 11px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             outline: none;
-            font-weight: 700;
+            font-weight: 600;
             cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            transition: border-color 0.2s;
+        }
+        .tb-timeframe-selector:focus {
+            border-color: #00c9ff;
         }
         .tb-timeframe-selector option {
-            background: #0d1b2a;
+            background: #0a0f1a;
             color: #e0e6f0;
         }
 
         .tb-analyse-btn {
             width: 100%;
-            padding: 8px;
-            font-size: 10.5px;
-            font-weight: 700;
+            padding: 10px;
+            font-size: 10px;
+            font-weight: 800;
             letter-spacing: 1px;
-            background: linear-gradient(135deg, #005b8e, #0099cc);
+            background: linear-gradient(135deg, #0072ff, #00c6ff);
             color: #fff;
             border: none;
-            border-radius: 7px;
+            border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: all 0.2s;
-            box-shadow: 0 3px 10px rgba(0, 201, 255, 0.25);
-            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 201, 255, 0.3);
+            margin-bottom: 10px;
         }
         .tb-analyse-btn:hover {
-            background: linear-gradient(135deg, #006fa8, #00b8f0);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0, 201, 255, 0.4);
         }
         .tb-analyse-btn:disabled {
-            background: #1e3a5f;
-            color: #5a7a9a;
+            background: #2c3e50;
+            color: #7f8c8d;
             cursor: not-allowed;
             box-shadow: none;
+            transform: none;
         }
 
         /* ছোট সিগন্যাল বক্স (UP / DOWN) */
         .tb-signal-box {
             border-radius: 8px;
-            padding: 10px 6px;
+            padding: 12px 6px;
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 2px;
-            border: 1px solid #1e3a5f;
-            background: #111e30;
-            margin-bottom: 8px;
-            transition: all 0.3s;
+            gap: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.3);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
         }
         .tb-signal-box.up {
-            background: #0a2e1a;
-            border-color: #27ae60;
-            box-shadow: 0 0 18px rgba(39, 174, 96, 0.3);
+            background: rgba(39, 174, 96, 0.15);
+            border-color: rgba(39, 174, 96, 0.4);
+            box-shadow: 0 0 20px rgba(39, 174, 96, 0.15);
         }
         .tb-signal-box.down {
-            background: #2e0a0a;
-            border-color: #e74c3c;
-            box-shadow: 0 0 18px rgba(231, 76, 60, 0.3);
+            background: rgba(231, 76, 60, 0.15);
+            border-color: rgba(231, 76, 60, 0.4);
+            box-shadow: 0 0 20px rgba(231, 76, 60, 0.15);
         }
         .tb-sig-label {
             font-size: 8.5px;
             letter-spacing: 1px;
-            color: #7a9abf;
+            color: #a0aec0;
             text-transform: uppercase;
         }
         .tb-sig-arrow {
-            font-size: 28px;
+            font-size: 26px;
             line-height: 1;
             margin: 2px 0;
-            color: #4a6a8a;
+            color: #4a5568;
+            transition: color 0.3s, text-shadow 0.3s;
         }
         .tb-signal-box.up .tb-sig-arrow {
             color: #2ecc71;
-            text-shadow: 0 0 15px rgba(46, 204, 113, 0.6);
+            text-shadow: 0 0 15px rgba(46, 204, 113, 0.5);
         }
         .tb-signal-box.down .tb-sig-arrow {
             color: #e74c3c;
-            text-shadow: 0 0 15px rgba(231, 76, 60, 0.6);
+            text-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
         }
         .tb-sig-text {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
             letter-spacing: 2px;
-            color: #7a9abf;
+            color: #a0aec0;
         }
         .tb-signal-box.up .tb-sig-text { color: #2ecc71; }
         .tb-signal-box.down .tb-sig-text { color: #e74c3c; }
         .tb-sig-sub {
             font-size: 8px;
-            color: #5a7a9a;
+            color: #718096;
+            margin-top: 2px;
         }
 
         /* টাইমার প্রগ্রেস বার */
         .tb-timer-label {
             font-size: 9px;
             letter-spacing: 0.5px;
-            color: #7a9abf;
-            margin-bottom: 4px;
+            color: #a0aec0;
+            margin-bottom: 6px;
             text-transform: uppercase;
             display: flex;
             justify-content: space-between;
+            font-weight: 600;
         }
         .tb-timer-bar-wrap {
-            background: #111e30;
+            background: rgba(0, 0, 0, 0.5);
             border-radius: 5px;
-            height: 5px;
+            height: 6px;
             overflow: hidden;
-            border: 1px solid #1e3a5f;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .tb-timer-bar {
             height: 100%;
-            background: linear-gradient(90deg, #005b8e, #00c9ff);
+            background: linear-gradient(90deg, #0072ff, #00c6ff);
             border-radius: 5px;
-            transition: width 0.1s linear; /* রিয়েল টাইম স্মুথনেস এর জন্য 0.1s করা হয়েছে */
+            transition: width 0.1s linear;
         }
 
-        /* ফুল স্ক্রিন স্ক্যানিং অ্যানিমেশন (মাঝখানের লেখা ছাড়া) */
+        /* ফুল স্ক্রিন স্ক্যানিং অ্যানিমেশন */
         #tb-scan-overlay {
             position: fixed;
             inset: 0;
@@ -319,28 +326,28 @@
             z-index: 9999998;
             display: none;
             overflow: hidden;
-            background: rgba(0, 201, 255, 0.03);
+            background: rgba(0, 201, 255, 0.02);
         }
         .tb-scan-laser {
             position: absolute;
             left: 0;
             width: 100%;
-            height: 120px;
-            background: linear-gradient(to bottom, transparent, rgba(0, 255, 170, 0.25), rgba(0, 201, 255, 0.75));
-            border-bottom: 3px solid #00ffcc;
-            box-shadow: 0 8px 30px rgba(0, 255, 204, 0.8);
-            animation: tbLaserMove 1.1s ease-in-out infinite alternate;
+            height: 150px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 201, 255, 0.1), rgba(0, 201, 255, 0.4));
+            border-bottom: 2px solid #00c9ff;
+            box-shadow: 0 8px 30px rgba(0, 201, 255, 0.5);
+            animation: tbLaserMove 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
         }
         .tb-scan-grid {
             position: absolute;
             inset: 0;
             background-image: 
-                linear-gradient(rgba(0, 201, 255, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 201, 255, 0.08) 1px, transparent 1px);
-            background-size: 40px 40px;
+                linear-gradient(rgba(0, 201, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 201, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
         @keyframes tbLaserMove {
-            0% { top: -120px; }
+            0% { top: -150px; }
             100% { top: 100%; }
         }
     `;
@@ -509,10 +516,10 @@
                 activeTimeframe = selectedTimeMs;
                 activeTimeframeLabel = selectedLabel;
                 
-                // রিয়েল টাইম ক্যান্ডেল বাউন্ডারির সাথে সিংক করা (যেমন ঘড়ির ঠিক ০০ সেকেন্ডে)
+                // রিয়েল টাইম ক্যান্ডেল বাউন্ডারির সাথে সিংক করা
                 let nextBoundary = Math.ceil(nowMs / activeTimeframe) * activeTimeframe;
                 if (nextBoundary - nowMs < 1000) {
-                    nextBoundary += activeTimeframe; // যদি সময় ১ সেকেন্ডের কম থাকে, তাহলে পরের ক্যান্ডেলে শিফট হবে
+                    nextBoundary += activeTimeframe;
                 }
                 lockedUntil = nextBoundary;
             } 
@@ -527,7 +534,7 @@
         }, 2000);
     }
 
-    // প্রতি ১০০ মিলি-সেকেন্ডে ঘড়ি এবং লক টাইমার প্রগ্রেস আপডেট (রিয়েল টাইম স্মুথনেস)
+    // প্রতি ১০০ মিলি-সেকেন্ডে ঘড়ি এবং লক টাইমার প্রগ্রেস আপডেট
     const botInterval = setInterval(() => {
         if (!document.getElementById('floating-trading-bot-widget')) {
             clearInterval(botInterval);
@@ -556,18 +563,22 @@
         
         // প্রগ্রেস বার পার্সেন্টেজ
         let pct = 0;
-        if (activeTimeframe > 0) {
+        if (activeTimeframe > 0 && currentSignal) {
             pct = (remainingMs / activeTimeframe) * 100;
         }
         timerBar.style.width = `${pct}%`;
 
-        // নির্দিষ্ট লক টাইম শেষ হলে অটোমেটিকভাবে নতুন সিগন্যাল আপডেট হওয়া
+        // নির্দিষ্ট লক টাইম শেষ হলে সিগন্যাল রিসেট করে ইউজারকে ম্যানুয়াল স্ক্যান করতে বলা হচ্ছে
         if (currentSignal && nowMs >= lockedUntil && !isScanning) {
-            currentSignal = generateTrueRandom();
-            lockedUntil = lockedUntil + activeTimeframe; // রিয়েল টাইম ক্যান্ডেল অনুযায়ী পরবর্তী লক
+            currentSignal = null; 
+            lockedUntil = 0;
             
+            sigBox.className = 'tb-signal-box';
             sigLabel.textContent = `${activeTimeframeLabel} Signal`;
-            renderSignal(currentSignal, `${h}:${m} ${ampm}`);
+            sigArrow.textContent = '●';
+            sigText.textContent = 'TIME OVER';
+            sigSub.textContent = 'Click Analyses to Scan Again';
+            scanBtn.textContent = '🔍 ANALYSES CHART';
         }
     }, 100);
 
@@ -625,7 +636,7 @@
         isPanelOpen = !isPanelOpen;
         panel.style.display = isPanelOpen ? 'block' : 'none';
         if (isPanelOpen && !currentSignal) {
-            runChartScan();
+            // প্যানেল ওপেন হলে আর অটো স্ক্যান করবে না, ইউজারের জন্য অপেক্ষা করবে
         }
     });
 
